@@ -1,0 +1,48 @@
+Statistical Inference Course Project Part. 1
+======
+
+> The exponential distribution can be simulated in R with rexp(n, lambda) where lambda is the rate parameter. The mean of exponential distribution is 1/lambda and the standard deviation is also also 1/lambda. Set lambda = 0.2 for all of the simulations. In this simulation, you will investigate the distribution of averages of 40 exponential(0.2)s. Note that you will need to do a thousand or so simulated averages of 40 exponentials.
+
+> Illustrate via simulation and associated explanatory text the properties of the distribution of the mean of 40 exponential(0.2)s.  You should  
+> 1. Show where the distribution is centered at and compare it to the theoretical center of the distribution.  
+> 2. Show how variable it is and compare it to the theoretical variance of the distribution.  
+> 3. Show that the distribution is approximately normal.  
+
+## Processing Data
+```{r preparedata}
+set.seed(12345)
+itemSize = 1000
+sampleSize = 40
+lambda = .2
+mat = matrix(rexp(itemSize * sampleSize, rate = lambda), nrow = itemSize, ncol = sampleSize)
+items = rowMeans(mat)
+```
+
+## Results
+```{r, fig.width=10, fig.height=8}
+simMean = round(mean(items), digit = 2)
+theoMean = 1/lambda
+simVar = round(var(items), digit = 2)
+theoVar = (1/lambda)^2 / sampleSize
+
+hist(items, breaks = 100, prob=TRUE, xlab = NULL)
+lines(density(items), lwd = 1, col = "red", lty = "solid")
+abline(v = simMean, lwd = 1, col = "red", lty = "dashed")
+abline(v = theoMean, lwd = 1, col = "blue", lty = "dashed")
+
+normal.x = seq(min(items), max(items), length = itemSize)
+normal.y = dnorm(normal.x, mean = 1/lambda, sd = (1/lambda)/sqrt(sampleSize))
+lines(normal.x, normal.y, lwd = 1, col = "blue", lty = "solid")
+legend("topright", c("Simulation Center", "Theoretical Center", "Simulation SD", "Theoretical SD"), lty=c("dashed", "dashed", "solid", "solid"), lwd=2, col = c("red", "blue", "red", "blue"))
+```
+
+### Center of the distribution.
+**Center of the distribution from simulation is _`r simMean`_ and theoretical center of the distribution is _`r theoMean`_.** 
+
+### Variances
+**Variance from simulation is _`r simVar`_ and theoretical variance is _`r theoVar`_.** 
+
+### The distribution is approximately normal.
+```{r, fig.width=10, fig.height=8}
+qqnorm(items); qqline(items, col = "red", lty = "dashed")
+```
